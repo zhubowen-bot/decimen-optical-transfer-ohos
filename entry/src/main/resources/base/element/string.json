@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "屏幕到摄像头喷泉码文件传输"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "屏幕到摄像头喷泉码文件传输"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "LiveQRTransfer"
+    },
+    {
+      "name": "camera_reason",
+      "value": "LiveQRTransfer 使用摄像头读取发送者的动画二维码流并恢复传输的文件。"
+    }
+  ]
+}

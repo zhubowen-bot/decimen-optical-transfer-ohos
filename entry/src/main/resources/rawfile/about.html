@@ -1,0 +1,59 @@
+<!doctype html>
+<!-- LiveQRTransfer Optical Transfer — 关于页（简易占位版，待补充） -->
+<html lang="zh-CN">
+  <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; font-src 'none'; base-uri 'none'; form-action 'none'; script-src 'none'; img-src data: blob:">
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>LiveQRTransfer 光传输 — 关于</title>
+    <meta name="theme-color" content="#fafaf7" />
+    <style>
+      *{box-sizing:border-box}
+      :root{color-scheme:light;--bg:#fafaf7;--panel:#ffffff;--panel-strong:#f5f3ed;--line:#e8e6e0;--line-bright:#d9d5cc;--text:#262626;--text-dim:#4a4a46;--muted:#757570;--muted-dim:#9a9890;--accent:#d97706;--accent-hi:#b45309;--accent-ink:#ffffff}
+      html{background:var(--bg)}
+      body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;min-height:100vh}
+      .about-shell{width:min(720px,calc(100% - 32px));margin:0 auto;padding:clamp(48px,9vw,96px) 0 40px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+      .brand-mark{width:72px;height:72px;border-radius:18px;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800}
+      h1{margin:0;font-size:clamp(30px,6vw,44px);line-height:1.15;letter-spacing:-.02em;font-weight:700}
+      .hint{color:var(--muted);font-size:14px;max-width:520px}
+      .card{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 22px;margin-top:6px}
+      .row{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
+      .row:last-child{border-bottom:0}
+      .row dt{color:var(--muted);flex:none}
+      .row dd{margin:0;color:var(--text);text-align:right;overflow-wrap:anywhere}
+      a{color:var(--accent);text-decoration:none}
+      a:hover,a:focus-visible{text-decoration:underline}
+      .license{color:var(--muted);font-size:12px;margin-top:20px;max-width:520px}
+      .footer{margin-top:32px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 16px;padding:16px max(22px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left));border-top:1px solid var(--line);color:var(--muted-dim);font-size:11px}
+      .footer a{color:var(--muted);text-decoration:none}
+      .footer a:hover,.footer a:focus-visible{color:var(--accent);text-decoration:underline}
+    </style>
+  </head>
+  <body>
+    <main class="about-shell">
+      <div class="brand-mark" aria-hidden="true">L</div>
+      <h1>LiveQRTransfer</h1>
+      <p class="hint">喷泉码二维码文件传输 — 屏幕到摄像头，无需网络、无需配对、无需账户。</p>
+      <section class="card" aria-label="应用信息">
+        <dl>
+          <div class="row"><dt>版本</dt><dd>v1.0.0</dd></div>
+          <div class="row"><dt>开源协议</dt><dd>AGPL-3.0-or-later</dd></div>
+          <div class="row"><dt>兼容性</dt><dd>兼容 decimen.app 及任何其他 Decimen 设备</dd></div>
+        </dl>
+      </section>
+      <p class="license">
+        本项目基于 Decimen Optical Transfer（© 2026 Evan Crawley）二次开发，遵循
+        <a href="https://github.com/bashalarmistalt/decimen-optical-transfer/blob/main/LICENSE">AGPL-3.0-or-later 许可协议</a>。
+      </p>
+    </main>
+    <footer class="footer">
+      <span>
+        <a href="https://github.com/bashalarmistalt/decimen-optical-transfer">原项目 GitHub</a>
+      </span>
+      <span>
+        <a href="https://github.com/zhubowen-bot/decimen-optical-transfer-ohos">本项目 GitHub</a>
+      </span>
+    </footer>
+  </body>
+</html>
