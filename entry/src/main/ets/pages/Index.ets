@@ -13,6 +13,8 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 
 const DOMAIN: number = 0xdc1;
 const TAG: string = 'LiveQRTransfer';
+// H5 主题色（与 rawfile 页面 :root 的 --accent 保持一致）
+const ACCENT_COLOR: string = '#d97706';
 
 interface MenuItem {
   symbolGlyph: SymbolGlyphModifier;
@@ -27,7 +29,7 @@ const MENU_CONFIG: MenuItem[] = [
     symbolGlyph: new SymbolGlyphModifier($r('sys.symbol.paperplane_fill'))
       .fontColor([$r('sys.color.ohos_id_color_bottom_tab_icon_off')]),
     symbolGlyph1: new SymbolGlyphModifier($r('sys.symbol.paperplane_fill'))
-      .fontColor([$r('sys.color.ohos_id_color_activated')]),
+      .fontColor([ACCENT_COLOR]),
     label: '发送',
     url: $rawfile('decimen-sender.html')
   },
@@ -35,7 +37,7 @@ const MENU_CONFIG: MenuItem[] = [
     symbolGlyph: new SymbolGlyphModifier($r('sys.symbol.camera_fill'))
       .fontColor([$r('sys.color.ohos_id_color_bottom_tab_icon_off')]),
     symbolGlyph1: new SymbolGlyphModifier($r('sys.symbol.camera_fill'))
-      .fontColor([$r('sys.color.ohos_id_color_activated')]),
+      .fontColor([ACCENT_COLOR]),
     label: '接收',
     url: $rawfile('decimen-receiver.html')
   },
@@ -43,7 +45,7 @@ const MENU_CONFIG: MenuItem[] = [
     symbolGlyph: new SymbolGlyphModifier($r('sys.symbol.info_circle_fill'))
       .fontColor([$r('sys.color.ohos_id_color_bottom_tab_icon_off')]),
     symbolGlyph1: new SymbolGlyphModifier($r('sys.symbol.info_circle_fill'))
-      .fontColor([$r('sys.color.ohos_id_color_activated')]),
+      .fontColor([ACCENT_COLOR]),
     label: '关于',
     url: $rawfile('about.html')
   }
@@ -105,6 +107,7 @@ struct Index {
   private saveFile: fs.File | undefined = undefined;
   private saveName: string = '';
   private savePath: string = '';
+  private saveBytes: number = 0;
 
   aboutToAppear(): void {
     const context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
@@ -177,7 +180,8 @@ struct Index {
       this.savePath = `${this.saveDir}/decimen-received.bin`;
       const file: fs.File = fs.openSync(this.savePath, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE | fs.OpenMode.TRUNC);
       this.saveFile = file;
-      hilog.info(DOMAIN, TAG, 'save begin %{public}s', name);
+      this.saveBytes = 0;
+      hilog.info(DOMAIN, TAG, 'save begin %{public}s -> %{public}s', name, this.savePath);
     } catch (err) {
       hilog.warn(DOMAIN, TAG, 'save begin failed: %{public}s', String(err));
     }
@@ -186,12 +190,20 @@ struct Index {
   onAppendChunk(base64: string): void {
     const file: fs.File | undefined = this.saveFile;
     if (file === undefined) {
+      hilog.warn(DOMAIN, TAG, 'append chunk dropped: saveFile not opened');
       return;
     }
     try {
       const helper: util.Base64Helper = new util.Base64Helper();
-      const buf: ArrayBuffer = helper.decodeSync(base64);
-      fs.writeSync(file.fd, buf);
+      const decoded: ArrayBuffer = helper.decodeSync(base64);
+      // decodeSync 返回的原生缓冲区直接写入会报 "Illegal write buffer"，
+      // 经 new Uint8Array 重新包装后再取 .buffer（华为开发者论坛验证的 workaround）
+      const buf: ArrayBuffer = new Uint8Array(decoded).buffer as ArrayBuffer;
+      const n: number = fs.writeSync(file.fd, buf);
+      this.saveBytes += n;
+      if (this.saveBytes % (4 * 1024 * 1024) < n) {
+        hilog.info(DOMAIN, TAG, 'saved %{public}d bytes so far', this.saveBytes);
+      }
     } catch (err) {
       hilog.warn(DOMAIN, TAG, 'save chunk failed: %{public}s', String(err));
     }
@@ -211,14 +223,26 @@ struct Index {
     if (srcPath === '') {
       return;
     }
+    hilog.info(DOMAIN, TAG, 'save end, wrote %{public}d bytes, copying from %{public}s', this.saveBytes, srcPath);
     try {
       const options = new picker.DocumentSaveOptions();
       options.newFileNames = [this.saveName];
       const savePicker = new picker.DocumentViewPicker();
       const uris: string[] = await savePicker.save(options);
       if (uris.length > 0) {
-        fs.copyFileSync(srcPath, uris[0]);
-        hilog.info(DOMAIN, TAG, 'saved to %{public}s', uris[0]);
+        // 对 picker 返回的 URI 用 copyFileSync 在部分版本会 ENOENT，
+        // 改为 openSync(uri) + 流式拷贝（官方文档推荐的 URI 写入方式）
+        const dest: fs.File = fs.openSync(uris[0], fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE | fs.OpenMode.TRUNC);
+        const src: fs.File = fs.openSync(srcPath, fs.OpenMode.READ_ONLY);
+        const chunk: ArrayBuffer = new ArrayBuffer(1024 * 1024);
+        let got: number = fs.readSync(src.fd, chunk);
+        while (got > 0) {
+          fs.writeSync(dest.fd, chunk.slice(0, got));
+          got = fs.readSync(src.fd, chunk);
+        }
+        fs.closeSync(src);
+        fs.closeSync(dest);
+        hilog.info(DOMAIN, TAG, 'saved to %{public}s (%{public}d bytes)', uris[0], this.saveBytes);
       }
     } catch (err) {
       hilog.warn(DOMAIN, TAG, 'save picker failed: %{public}s', String(err));
@@ -350,7 +374,8 @@ struct Index {
             .tabBar(new BottomTabBarStyle({
               normal: item.symbolGlyph,
               selected: item.symbolGlyph1
-            }, item.label))
+            }, item.label)
+              .labelStyle({ selectedColor: ACCENT_COLOR }))
           }, (item: MenuItem, index: number) => index.toString())
         }
         .scrollable(false) // 禁用左右滑动切换，仅通过底部导航栏点击切换
@@ -364,7 +389,9 @@ struct Index {
           systemMaterialEffect: {
             materialType: hdsMaterial.MaterialType.IMMERSIVE,
             materialLevel: hdsMaterial.MaterialLevel.EXQUISITE
-          }
+          },
+          // 光感颜色跟随 H5 主题（HTML --accent）
+          lightColor: ACCENT_COLOR
         })
         .onChange((index: number) => {
           this.currentTabIndex = index;

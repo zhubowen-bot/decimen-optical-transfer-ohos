@@ -1,6 +1,6 @@
 {
   "app": {
-    "bundleName": "com.decimen.opticaltransfer",
+    "bundleName": "com.liveqrtransfer.bowenapp",
     "vendor": "example",
     "versionCode": 1000000,
     "versionName": "1.0.0",

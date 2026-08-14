@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\a1519\\.ohos\\config\\default_ohos_wx1R9Tt7U70UL-6eXyYzj2aB7t0A5yre_Lop5zaaxsg=.cer",
+          "certpath": "C:\\Users\\a1519\\.ohos\\config\\default_decimen-optical-transfer-ohos_bm9yZc-R_tZaFgwB4W84EwevXUg835oQlWR6qF_vBGY=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B74CB523C65A59F76D7C3F9B53A3CCB4122C580228DF265EB9F5293A9E1BDE1330AAB112D715782",
-          "profile": "C:\\Users\\a1519\\.ohos\\config\\default_ohos_wx1R9Tt7U70UL-6eXyYzj2aB7t0A5yre_Lop5zaaxsg=.p7b",
+          "keyPassword": "0000001B95B64AEF7542D86291A6E954A604D5E0B8119F504DEB85B952D3343AD754626C53B738AAC09707",
+          "profile": "C:\\Users\\a1519\\.ohos\\config\\default_decimen-optical-transfer-ohos_bm9yZc-R_tZaFgwB4W84EwevXUg835oQlWR6qF_vBGY=.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\a1519\\.ohos\\config\\default_ohos_wx1R9Tt7U70UL-6eXyYzj2aB7t0A5yre_Lop5zaaxsg=.p12",
-          "storePassword": "0000001BCD242A50201FE53922EEFA5348E5506816641BE9152374FB0182EC610E9D6F32E531900B5C9EBE"
+          "storeFile": "C:\\Users\\a1519\\.ohos\\config\\default_decimen-optical-transfer-ohos_bm9yZc-R_tZaFgwB4W84EwevXUg835oQlWR6qF_vBGY=.p12",
+          "storePassword": "0000001BD803C65770299F914CDA41C0858D1CA30E309B85213547112E28E41C5D2AF9B84FC959C1BD51F6"
         }
       }
     ],

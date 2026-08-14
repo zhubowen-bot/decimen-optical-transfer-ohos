@@ -1,0 +1,479 @@
+<!doctype html>
+<!-- LiveQRTransfer Optical Transfer — 接收历史页（localStorage 元数据 + IndexedDB 文件内容） -->
+<html lang="zh-CN">
+  <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; font-src 'none'; base-uri 'none'; form-action 'none'; script-src 'unsafe-inline'; img-src 'self' data: blob: resource:; connect-src data: blob:">
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>接收历史 — LiveQRTransfer</title>
+    <meta name="theme-color" content="#fafaf7" />
+    <style>
+      *{box-sizing:border-box}
+      :root{color-scheme:light;--bg:#fafaf7;--panel:#ffffff;--panel-strong:#f5f3ed;--line:#e8e6e0;--line-bright:#d9d5cc;--text:#262626;--text-dim:#4a4a46;--muted:#757570;--muted-dim:#9a9890;--accent:#d97706;--accent-hi:#b45309;--accent-ink:#ffffff;--red:#b3261e;--red-rgb:179,38,30;--accent-rgb:217,119,6;--bg-rgb:250,250,247}
+      html{background:var(--bg)}
+      body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;min-height:100vh}
+      button{font:inherit}
+      button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+      [hidden]{display:none!important}
+      .topbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:max(8px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 8px max(16px,env(safe-area-inset-left));border-bottom:1px solid var(--line);background:rgba(var(--bg-rgb),.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+      .topbar h1{flex:1;margin:0;text-align:center;font-size:16px;font-weight:700;color:var(--text)}
+      .nav-btn{width:64px;padding:8px 0;border:0;border-radius:8px;background:transparent;color:var(--accent);font-size:14px;font-weight:600;cursor:pointer;text-align:left}
+      .nav-btn:hover{background:var(--panel-strong)}
+      .nav-btn.danger{color:var(--red);text-align:right}
+      .nav-btn.danger:disabled{color:var(--muted-dim);cursor:default}
+      .shell{width:min(720px,calc(100% - 32px));margin:0 auto;padding:18px 0 calc(110px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:stretch;gap:12px}
+      .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+      .toggle-card{display:flex;align-items:center;justify-content:space-between;gap:16px}
+      .toggle-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+      .toggle-text strong{font-size:14px;color:var(--text)}
+      .toggle-text .hint{margin:0;font-size:12px;color:var(--muted)}
+      .switch{position:relative;flex:none;width:48px;height:28px}
+      .switch input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+      .switch .track{position:absolute;inset:0;border-radius:999px;background:var(--line-bright);transition:background-color .15s ease}
+      .switch .track::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s ease}
+      .switch input:checked+.track{background:var(--accent)}
+      .switch input:checked+.track::after{transform:translateX(20px)}
+      .switch input:focus-visible+.track{outline:2px solid var(--accent);outline-offset:2px}
+      .banner{padding:10px 14px;border-radius:10px;background:rgba(var(--red-rgb),.05);border:1px solid rgba(var(--red-rgb),.25);color:var(--red);font-size:12px}
+      .stats{margin:0;color:var(--muted);font-size:12px;text-align:center}
+      .list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+      .item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+      .ext-badge{flex:none;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:var(--accent);background:rgba(var(--accent-rgb),.09);border:1px solid rgba(var(--accent-rgb),.28);font-size:10px;font-weight:700;letter-spacing:.02em;overflow:hidden}
+      .item-main{flex:1;min-width:0}
+      .item-name{margin:0;font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .item-meta{margin:2px 0 0;font-size:11px;color:var(--muted)}
+      .item-actions{flex:none;display:flex;align-items:center;gap:14px}
+      .text-button{padding:0;border:0;border-radius:0;background:transparent;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer}
+      .text-button:hover{text-decoration:underline}
+      .text-button:disabled{color:var(--muted-dim);cursor:not-allowed;text-decoration:none}
+      .text-button.danger{color:var(--red)}
+      .empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:52px 16px;text-align:center}
+      .empty svg{width:56px;height:56px;color:var(--muted-dim)}
+      .empty-title{margin:0;font-size:15px;font-weight:600;color:var(--text-dim)}
+      .empty .hint{margin:0;font-size:12px}
+      .overlay{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.42)}
+      .dialog{width:min(92vw,360px);background:var(--panel);border:1px solid var(--line-bright);border-radius:14px;padding:20px}
+      .dialog h2{margin:0 0 8px;font-size:16px;color:var(--text)}
+      .dialog p{margin:0 0 18px;font-size:13px;color:var(--muted);line-height:1.6}
+      .dialog-actions{display:flex;justify-content:flex-end;gap:10px}
+      .secondary-button{padding:9px 16px;color:var(--text-dim);background:var(--panel);border:1px solid var(--line-bright);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+      .secondary-button:hover{border-color:var(--text-dim);color:var(--text)}
+      .danger-button{padding:9px 16px;color:var(--accent-ink);background:var(--red);border:0;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+      .danger-button:hover{background:#8f1d17}
+      .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:20;max-width:min(90vw,420px);padding:9px 18px;color:#f5f4f0;background:rgba(23,23,23,.9);border:1px solid rgba(255,255,255,.18);border-radius:999px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      @media(max-width:420px){.shell{width:calc(100% - 24px)}.item{gap:10px;padding:11px 12px}.item-actions{gap:12px}}
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <button id="back" class="nav-btn" type="button">‹ 返回</button>
+      <h1>接收历史</h1>
+      <button id="clear-all" class="nav-btn danger" type="button" hidden>清空</button>
+    </header>
+    <main class="shell">
+      <section class="card toggle-card" aria-label="历史记录开关">
+        <div class="toggle-text">
+          <strong>记录接收历史</strong>
+          <span class="hint" id="toggle-hint">关闭后，新接收的文件将不再记入历史</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggle" aria-label="记录接收历史" />
+          <span class="track" aria-hidden="true"></span>
+        </label>
+      </section>
+      <div class="banner" id="paused-banner" hidden>历史记录已关闭，新接收的文件不会记入历史。</div>
+      <p class="stats" id="stats" hidden></p>
+      <ul class="list" id="list"></ul>
+      <div class="empty" id="empty" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <path d="M12 10v6M9 13h6" />
+        </svg>
+        <p class="empty-title">暂无接收记录</p>
+        <p class="hint">在「接收」页完成一次文件接收后，会自动记录在这里</p>
+      </div>
+    </main>
+    <div class="overlay" id="overlay" hidden>
+      <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dlg-title">
+        <h2 id="dlg-title">清空全部历史？</h2>
+        <p id="dlg-text">将删除全部 <strong id="overlay-count">0</strong> 条接收记录及其保存的文件内容，此操作不可恢复。</p>
+        <div class="dialog-actions">
+          <button id="dlg-cancel" class="secondary-button" type="button">取消</button>
+          <button id="dlg-ok" class="danger-button" type="button">清空</button>
+        </div>
+      </div>
+    </div>
+    <div class="toast" id="toast" role="status" hidden></div>
+    <script>
+      /* LiveQRTransfer 接收历史存储模块 —— 接收页与历史页内联共用，两处代码必须保持一致 */
+      (function () {
+        "use strict";
+        var LS_META = "lqt.history.meta.v1";
+        var LS_ENABLED = "lqt.history.enabled.v1";
+        var DB_NAME = "lqt_history";
+        var DB_STORE = "files";
+        var MAX_ENTRIES = 100;                 /* 元数据最多保留条数（超出删除最旧记录） */
+        var CONTENT_BUDGET = 256 * 1024 * 1024; /* 内容存储总预算，超出后清理最早的内容，仅保留记录 */
+        var CONTENT_ENTRY_LIMIT = 64 * 1024 * 1024; /* 单条内容上限（与发送端 64MB 限制一致） */
+
+        var dbPromise = null;
+
+        function readMeta() {
+          try {
+            var raw = localStorage.getItem(LS_META);
+            if (!raw) return [];
+            var arr = JSON.parse(raw);
+            return Array.isArray(arr) ? arr : [];
+          } catch (e) { return []; }
+        }
+        function writeMeta(arr) {
+          try { localStorage.setItem(LS_META, JSON.stringify(arr)); } catch (e) { /* 存储不可用时静默失败 */ }
+        }
+        function isEnabled() {
+          try { return localStorage.getItem(LS_ENABLED) !== "0"; } catch (e) { return true; }
+        }
+        function setEnabled(on) {
+          try { localStorage.setItem(LS_ENABLED, on ? "1" : "0"); } catch (e) { }
+        }
+        function openDb() {
+          if (dbPromise) return dbPromise;
+          dbPromise = new Promise(function (resolve) {
+            try {
+              if (!window.indexedDB) { resolve(null); return; }
+              var req = indexedDB.open(DB_NAME, 1);
+              req.onupgradeneeded = function () {
+                var db = req.result;
+                if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE, { keyPath: "id" });
+              };
+              req.onsuccess = function () { resolve(req.result); };
+              req.onerror = function () { resolve(null); };
+              req.onblocked = function () { resolve(null); };
+            } catch (e) { resolve(null); }
+          });
+          return dbPromise;
+        }
+        function txReq(mode, run) {
+          return openDb().then(function (db) {
+            if (!db) return null;
+            return new Promise(function (resolve) {
+              try {
+                var tx = db.transaction(DB_STORE, mode);
+                var req = run(tx.objectStore(DB_STORE));
+                req.onsuccess = function () { resolve(req.result); };
+                req.onerror = function () { resolve(null); };
+                tx.onabort = function () { resolve(null); };
+              } catch (e) { resolve(null); }
+            });
+          });
+        }
+        function putContent(id, buf) {
+          return txReq("readwrite", function (s) { return s.put({ id: id, buf: buf }); }).then(function (r) { return r !== null; });
+        }
+        function getContent(id) {
+          return txReq("readonly", function (s) { return s.get(id); }).then(function (rec) {
+            return rec && rec.buf ? rec.buf : null;
+          });
+        }
+        function delContent(id) {
+          return txReq("readwrite", function (s) { return s.delete(id); });
+        }
+        function clearContents() {
+          return txReq("readwrite", function (s) { return s.clear(); });
+        }
+
+        /* 接收成功后调用：name 文件名，size 字节数，type MIME，bytes Uint8Array（可能为空） */
+        function recordFile(name, size, type, bytes) {
+          if (!isEnabled()) return;
+          var arr = readMeta();
+          var id = Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+          var rec = {
+            id: id,
+            name: name,
+            size: typeof size === "number" && size > 0 ? size : 0,
+            type: type || "application/octet-stream",
+            time: Date.now(),
+            hasContent: false
+          };
+          arr.unshift(rec);
+          if (arr.length > MAX_ENTRIES) {
+            var dropped = arr.splice(MAX_ENTRIES);
+            for (var i = 0; i < dropped.length; i++) delContent(dropped[i].id);
+          }
+          writeMeta(arr);
+          var keepable = bytes && bytes.length > 0 && bytes.length <= CONTENT_ENTRY_LIMIT;
+          if (!keepable) { pruneContent(); return; }
+          var buf = null;
+          try {
+            buf = (bytes.byteOffset === 0 && bytes.byteLength === bytes.buffer.byteLength)
+              ? bytes.buffer
+              : bytes.slice().buffer;
+          } catch (e) { buf = null; }
+          if (!buf) { pruneContent(); return; }
+          putContent(id, buf).then(function (ok) {
+            if (!ok) return;
+            var list = readMeta();
+            for (var j = 0; j < list.length; j++) {
+              if (list[j].id === id) { list[j].hasContent = true; break; }
+            }
+            writeMeta(list);
+            pruneContent();
+          });
+        }
+
+        /* 内容总预算裁剪：从最旧开始丢弃内容（记录仍在，仅 hasContent 置 false） */
+        function pruneContent() {
+          var list = readMeta();
+          var total = 0, order = [], i, j, rec;
+          for (i = list.length - 1; i >= 0; i--) {
+            if (list[i].hasContent) { order.push(list[i]); total += list[i].size || 0; }
+          }
+          var changed = false;
+          while (order.length && total > CONTENT_BUDGET) {
+            rec = order.shift();
+            total -= rec.size || 0;
+            delContent(rec.id);
+            for (j = 0; j < list.length; j++) {
+              if (list[j].id === rec.id) { list[j].hasContent = false; changed = true; break; }
+            }
+          }
+          if (changed) writeMeta(list);
+        }
+
+        function list() { return readMeta().slice(); }
+        function count() { return readMeta().length; }
+        function remove(id) {
+          var arr = readMeta();
+          var next = [], i;
+          for (i = 0; i < arr.length; i++) if (arr[i].id !== id) next.push(arr[i]);
+          if (next.length === arr.length) return;
+          writeMeta(next);
+          delContent(id);
+        }
+        function clearAll() {
+          writeMeta([]);
+          clearContents();
+        }
+
+        window.__decimenHistory = {
+          recordFile: recordFile,
+          list: list,
+          count: count,
+          remove: remove,
+          clearAll: clearAll,
+          getContent: getContent,
+          isEnabled: isEnabled,
+          setEnabled: setEnabled
+        };
+        /* 接收页压缩脚本注入点调用：window.__decimenRecordFile && window.__decimenRecordFile(name,size,type,bytes) */
+        window.__decimenRecordFile = recordFile;
+      })();
+
+      /* ---------- 历史页 UI ---------- */
+      (function () {
+        "use strict";
+        var H = window.__decimenHistory;
+        var elList = document.getElementById("list");
+        var elEmpty = document.getElementById("empty");
+        var elStats = document.getElementById("stats");
+        var elToggle = document.getElementById("toggle");
+        var elToggleHint = document.getElementById("toggle-hint");
+        var elBanner = document.getElementById("paused-banner");
+        var elClear = document.getElementById("clear-all");
+        var elOverlay = document.getElementById("overlay");
+        var elOverlayCount = document.getElementById("overlay-count");
+        var elToast = document.getElementById("toast");
+        var toastTimer = null;
+
+        function fmtSize(n) {
+          n = Number(n) || 0;
+          if (n >= 1073741824) return (n / 1073741824).toFixed(2) + " GB";
+          if (n >= 1048576) return (n / 1048576).toFixed(1) + " MB";
+          if (n >= 1024) return (n / 1024).toFixed(1) + " KB";
+          return n + " B";
+        }
+        function fmtTime(t) {
+          var d = new Date(Number(t) || 0);
+          if (isNaN(d.getTime())) return "";
+          function p(x) { return (x < 10 ? "0" : "") + x; }
+          return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+        }
+        function extOf(name) {
+          var n = String(name || "");
+          var i = n.lastIndexOf(".");
+          var ext = i > 0 && i < n.length - 1 ? n.slice(i + 1) : "";
+          if (!ext || ext.length > 6) return "FILE";
+          return ext.toUpperCase();
+        }
+        function toast(msg) {
+          elToast.textContent = msg;
+          elToast.hidden = false;
+          if (toastTimer) clearTimeout(toastTimer);
+          toastTimer = setTimeout(function () { elToast.hidden = true; }, 2200);
+        }
+
+        function itemNode(rec) {
+          var li = document.createElement("li");
+          li.className = "item";
+
+          var badge = document.createElement("span");
+          badge.className = "ext-badge";
+          badge.textContent = extOf(rec.name);
+
+          var main = document.createElement("div");
+          main.className = "item-main";
+          var name = document.createElement("p");
+          name.className = "item-name";
+          name.textContent = rec.name;
+          name.title = rec.name;
+          var meta = document.createElement("p");
+          meta.className = "item-meta";
+          meta.textContent = fmtSize(rec.size) + " · " + fmtTime(rec.time) + (rec.hasContent ? "" : " · 内容已清理");
+          main.append(name, meta);
+
+          var actions = document.createElement("div");
+          actions.className = "item-actions";
+          var save = document.createElement("button");
+          save.type = "button";
+          save.className = "text-button";
+          save.textContent = "保存";
+          if (!rec.hasContent) {
+            save.disabled = true;
+            save.title = "该文件内容已被清理（超出存储预算），仅保留记录信息";
+          }
+          save.addEventListener("click", function () { saveOne(rec, save); });
+          var del = document.createElement("button");
+          del.type = "button";
+          del.className = "text-button danger";
+          del.textContent = "删除";
+          del.addEventListener("click", function () { removeOne(rec); });
+          actions.append(save, del);
+
+          li.append(badge, main, actions);
+          return li;
+        }
+
+        function render() {
+          var arr = H.list();
+          var enabled = H.isEnabled();
+          elToggle.checked = enabled;
+          elBanner.hidden = enabled;
+          elToggleHint.textContent = enabled ? "关闭后，新接收的文件将不再记入历史" : "已关闭 — 新接收的文件不会记入历史";
+          if (arr.length) {
+            var total = 0;
+            for (var i = 0; i < arr.length; i++) total += arr[i].size || 0;
+            elStats.hidden = false;
+            elStats.textContent = "共 " + arr.length + " 条记录 · 合计 " + fmtSize(total) + (enabled ? "" : " · 记录已关闭");
+          } else {
+            elStats.hidden = true;
+          }
+          elClear.hidden = arr.length === 0;
+          elClear.disabled = arr.length === 0;
+          elList.textContent = "";
+          elEmpty.hidden = arr.length !== 0;
+          for (var j = 0; j < arr.length; j++) elList.appendChild(itemNode(arr[j]));
+        }
+
+        function saveOne(rec, btn) {
+          var old = btn.textContent;
+          btn.disabled = true;
+          btn.textContent = "准备中…";
+          H.getContent(rec.id).then(function (buf) {
+            function done(msg) {
+              btn.textContent = "已发起";
+              toast(msg);
+              setTimeout(function () {
+                if (btn.parentNode) { btn.textContent = old; btn.disabled = false; }
+              }, 2500);
+            }
+            function fail() {
+              btn.textContent = "保存失败";
+              toast("保存失败，请重试");
+              setTimeout(function () {
+                if (btn.parentNode) { btn.textContent = old; btn.disabled = false; }
+              }, 2500);
+            }
+            if (!buf) { fail(); return; }
+            if (window.decimenHost) {
+              /* 原生宿主分块保存（与接收页「保存文件」流程一致） */
+              try {
+                var u8 = new Uint8Array(buf);
+                var b64 = function (c) {
+                  var s = "", v = new Uint8Array(c);
+                  for (var t = 0; t < v.length; t++) s += String.fromCharCode(v[t]);
+                  return btoa(s);
+                };
+                btn.textContent = "保存中…";
+                window.decimenHost.beginSave(rec.name);
+                var CH = 1024 * 1024;
+                for (var i = 0; i < u8.length; i += CH) {
+                  window.decimenHost.appendChunk(b64(u8.subarray(i, Math.min(i + CH, u8.length))));
+                }
+                window.decimenHost.endSave();
+                done("已打开保存对话框");
+              } catch (e) { fail(); }
+            } else {
+              /* 网页回退：直接触发下载 */
+              try {
+                var url = URL.createObjectURL(new Blob([buf], { type: rec.type }));
+                var a = document.createElement("a");
+                a.href = url;
+                a.download = rec.name;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(function () {
+                  URL.revokeObjectURL(url);
+                  if (a.parentNode) a.parentNode.removeChild(a);
+                }, 60000);
+                done("已开始下载");
+              } catch (e) { fail(); }
+            }
+          }, function () { btn.textContent = "保存失败"; setTimeout(function () {
+            if (btn.parentNode) { btn.textContent = old; btn.disabled = false; }
+          }, 2500); toast("保存失败，请重试"); });
+        }
+
+        function removeOne(rec) {
+          H.remove(rec.id);
+          render();
+          toast("已删除 " + rec.name);
+        }
+
+        document.getElementById("back").addEventListener("click", function () {
+          try {
+            if (window.history.length > 1) { window.history.back(); return; }
+          } catch (e) { }
+          window.location.href = "about.html";
+        });
+
+        elToggle.addEventListener("change", function () {
+          H.setEnabled(elToggle.checked);
+          render();
+          toast(elToggle.checked ? "已开启历史记录" : "已关闭历史记录");
+        });
+
+        elClear.addEventListener("click", function () {
+          var arr = H.list();
+          if (!arr.length) return;
+          elOverlayCount.textContent = String(arr.length);
+          elOverlay.hidden = false;
+        });
+        document.getElementById("dlg-cancel").addEventListener("click", function () { elOverlay.hidden = true; });
+        document.getElementById("dlg-ok").addEventListener("click", function () {
+          H.clearAll();
+          elOverlay.hidden = true;
+          render();
+          toast("已清空全部历史");
+        });
+        elOverlay.addEventListener("click", function (ev) { if (ev.target === elOverlay) elOverlay.hidden = true; });
+
+        /* 接收页写入历史时（同源其他页面），实时刷新 */
+        window.addEventListener("storage", render);
+        window.addEventListener("pageshow", render);
+        document.addEventListener("visibilitychange", function () { if (!document.hidden) render(); });
+
+        render();
+      })();
+    </script>
+  </body>
+</html>

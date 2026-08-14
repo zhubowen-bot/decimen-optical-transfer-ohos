@@ -24,7 +24,8 @@ export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     try {
       initGzipTempDir(this.context.filesDir);
-      this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
+      // 应用强制浅色模式（H5 页面均为浅色主题）
+      this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
     }
@@ -45,7 +46,26 @@ export default class EntryAbility extends UIAbility {
         return;
       }
       hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
+      this.applySystemBarTheme();
     });
+  }
+
+  // 系统状态栏/导航栏跟随 H5 主题（rawfile 页面 :root --bg: #fafaf7）
+  private applySystemBarTheme(): void {
+    try {
+      window.getLastWindow(this.context).then((mainWindow: window.Window) => {
+        mainWindow.setWindowSystemBarProperties({
+          statusBarColor: '#FAFAF7',
+          statusBarContentColor: '#FF000000',
+          navigationBarColor: '#FAFAF7',
+          navigationBarContentColor: '#FF000000'
+        });
+      }).catch((e: Error) => {
+        hilog.error(DOMAIN, 'testTag', 'Failed to get the main window. Cause: %{public}s', JSON.stringify(e));
+      });
+    } catch (e) {
+      hilog.error(DOMAIN, 'testTag', 'Failed to apply system bar theme. Cause: %{public}s', JSON.stringify(e));
+    }
   }
 
   onWindowStageDestroy(): void {

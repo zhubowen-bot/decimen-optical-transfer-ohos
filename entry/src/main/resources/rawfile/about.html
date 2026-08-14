@@ -2,7 +2,7 @@
 <!-- LiveQRTransfer Optical Transfer — 关于页（简易占位版，待补充） -->
 <html lang="zh-CN">
   <head>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; font-src 'none'; base-uri 'none'; form-action 'none'; script-src 'none'; img-src data: blob:">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; font-src 'none'; base-uri 'none'; form-action 'none'; script-src 'unsafe-inline'; img-src 'self' data: blob: resource:">
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -14,40 +14,101 @@
       html{background:var(--bg)}
       body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;min-height:100vh}
       .about-shell{width:min(720px,calc(100% - 32px));margin:0 auto;padding:clamp(48px,9vw,96px) 0 40px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
-      .brand-mark{width:72px;height:72px;border-radius:18px;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800}
+      .brand-mark{width:72px;height:72px;border-radius:18px;object-fit:cover;display:block}
       h1{margin:0;font-size:clamp(30px,6vw,44px);line-height:1.15;letter-spacing:-.02em;font-weight:700}
       .hint{color:var(--muted);font-size:14px;max-width:520px}
+      .about-shell>.hint{color:var(--muted);margin-top:-3px}
       .card{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 22px;margin-top:6px}
       .row{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
       .row:last-child{border-bottom:0}
       .row dt{color:var(--muted);flex:none}
-      .row dd{margin:0;color:var(--text);text-align:right;overflow-wrap:anywhere}
+      .row dd{margin:0;color:var(--accent);text-align:right;overflow-wrap:anywhere}
       a{color:var(--accent);text-decoration:none}
       a:hover,a:focus-visible{text-decoration:underline}
-      .license{color:var(--muted);font-size:12px;margin-top:20px;max-width:520px}
-      .footer{margin-top:32px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 16px;padding:16px max(22px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left));border-top:1px solid var(--line);color:var(--muted-dim);font-size:11px}
-      .footer a{color:var(--muted);text-decoration:none}
-      .footer a:hover,.footer a:focus-visible{color:var(--accent);text-decoration:underline}
+      .license{width:100%;color:var(--muted);font-size:12px;margin:12px 0 0;max-width:520px}
+      .guide{text-align:left}
+      .guide summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;cursor:pointer;list-style:none;font-size:14px;color:var(--text)}
+      .guide summary::-webkit-details-marker{display:none}
+      .guide summary::after{content:"＋";color:var(--muted);font-size:16px;flex:none;transition:transform .15s ease}
+      .guide[open] summary::after{transform:rotate(45deg)}
+      .guide-body{border-top:1px solid var(--line);padding:2px 0 16px;font-size:13px;line-height:1.8;color:var(--text-dim)}
+      .guide-body h3{margin:12px 0 6px;font-size:13px;color:var(--text);font-weight:700}
+      .guide-body h3:first-child{margin-top:10px}
+      .guide-body ul{margin:0;padding-left:18px}
+      .guide-body li{margin:4px 0}
+      .history-card{display:flex;align-items:center;justify-content:space-between;gap:14px;text-decoration:none;color:var(--text);padding:16px 22px;transition:border-color .15s ease}
+      .history-card:hover,.history-card:focus-visible{text-decoration:none;border-color:var(--line-bright)}
+      .history-info{display:flex;flex-direction:column;gap:2px;min-width:0;text-align:left}
+      .history-info strong{font-size:15px;color:var(--text)}
+      .history-sub{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .history-chevron{flex:none;color:var(--muted-dim);font-size:24px;line-height:1;margin-left:8px}
+      .footer{margin-top:12px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 16px;padding:16px max(22px,env(safe-area-inset-right)) calc(96px + env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left));border-top:1px solid var(--line);color:var(--muted-dim);font-size:11px}
+      .footer a{color:var(--accent);text-decoration:none}
+      .footer a:hover,.footer a:focus-visible{text-decoration:underline}
     </style>
   </head>
   <body>
     <main class="about-shell">
-      <div class="brand-mark" aria-hidden="true">L</div>
+      <img class="brand-mark" src="decimen-icon.png" alt="LiveQRTransfer" />
       <h1>LiveQRTransfer</h1>
-      <p class="hint">喷泉码二维码文件传输 — 屏幕到摄像头，无需网络、无需配对、无需账户。</p>
+      <p class="hint">从屏幕到摄像头——无需无线信号或收发帐户</p>
       <section class="card" aria-label="应用信息">
         <dl>
-          <div class="row"><dt>版本</dt><dd>v1.0.0</dd></div>
+          <div class="row"><dt>HarmonyOS版本</dt><dd>v1.0.0</dd></div>
+          <div class="row"><dt>Decimen内核版本</dt><dd>v0.5.2</dd></div>
           <div class="row"><dt>开源协议</dt><dd>AGPL-3.0-or-later</dd></div>
-          <div class="row"><dt>兼容性</dt><dd>兼容 decimen.app 及任何其他 Decimen 设备</dd></div>
+          <div class="row"><dt>兼容性</dt><dd>兼容所有 Decimen 设备</dd></div>
+          <div class="row"><dt>联系我们</dt><dd>bowen_zbw@sjtu.edu.cn</dd></div>
         </dl>
       </section>
+      <a class="card history-card" href="history.html" aria-label="接收历史">
+        <span class="history-info">
+          <strong>接收历史</strong>
+          <span class="history-sub" id="history-summary">查看接收过的文件</span>
+        </span>
+        <span class="history-chevron" aria-hidden="true">›</span>
+      </a>
+      <details class="card guide">
+        <summary>使用说明</summary>
+        <div class="guide-body">
+          <h3>一、支持设备（多端兼容）</h3>
+          <ul>
+            <li><strong>Harmony OS 6.1 及以上鸿蒙手机 / 平板 / 电脑</strong>：在 AppGallery 应用市场搜索并下载 <strong>LiveQRTransfer</strong>，即本应用；</li>
+            <li><strong>电脑（Windows / macOS / Linux）</strong>：浏览器打开 <strong>decimen.app</strong> 网页版，点击“保存为应用”或“添加到桌面”即可使用；</li>
+            <li><strong>安卓 / iOS / Harmony OS 6.0 及以下鸿蒙设备</strong> ：用 系统浏览器 打开 <strong>decimen.app</strong>，点分享 →「添加到主屏幕」，即可像 App 一样使用；</li>
+            <li><strong>多端兼容</strong>：发送端与接收端可任意组合——鸿蒙手机发送、电脑接收，或网页发送、鸿蒙设备接收都可。传输全程无需网络、无需信号，数据以光为介质。</li>
+          </ul>
+          <h3>二、发送端参数说明（传输设置）</h3>
+          <ul>
+            <li><strong>发送帧率（10–60 帧/秒）</strong>：二维码刷新的速度。越高传输越快，但接收端解码压力越大。默认 60；若接收端频繁丢帧或校验失败，降到 30 或 20。</li>
+            <li><strong>每帧字节数（500–2953 字节）</strong>：每帧携带的数据量。越大速度越快，但二维码更密集，对光线和对焦要求更高。默认 2953；弱光或手持抖动时调小。</li>
+            <li><strong>纠错级别（L / M / Q / H）</strong>：二维码的容错等级。L 最快但最怕污损遮挡，H 容错最强（约可容忍 30% 遮挡）。默认 L；画面常被遮挡时选 H。</li>
+            <li><strong>布局（1 / 2 / 4 / 6 个二维码）</strong>：同一屏显示多个二维码，速度成倍提升，但单个码变小。1 个最稳；手机之间建议 1–2 个，设备固定时可 4–6 个。</li>
+            <li><strong>显示大小（300–1200 px）</strong>：二维码在屏幕上的尺寸，越大越容易扫。默认 900。</li>
+            <li><strong>内容限制</strong>：文本片段最多 4 MB；文件单次最多 64 MB（浏览器限制）。发送前文件自动 gzip 压缩，接收后自动解压并做 SHA-256 校验。</li>
+          </ul>
+          <h3>三、接收端参数说明（接收设置）</h3>
+          <ul>
+            <li><strong>采集宽度（960–3840）</strong>：摄像头采集分辨率。越高识别越准、越耗电。默认 1280；设备较旧可降到 960。</li>
+            <li><strong>采集帧率（30 / 60）</strong>：摄像头采集帧率，建议与发送端帧率一致。默认 60。</li>
+            <li><strong>解码线程（1–6）</strong>：并行解码的工作线程数，越多解码越快但越耗电。默认按设备性能自动选取。</li>
+          </ul>
+          <h3>四、常见问题</h3>
+          <ul>
+            <li><strong>收不到信号</strong>：确认发送端与接收端面对面，发送端屏幕亮度调到最高，距离约 20–40 厘米，避免反光；发送端页面保持在前台（切到后台会停滞）；点击放大二维码；调低帧率、字节数、布局数。</li>
+            <li><strong>传输很慢</strong>：提高发送帧率 / 每帧字节数，改用多二维码布局；缩短距离、放稳设备；确认接收端解码线程充足。</li>
+            <li><strong>频繁校验失败或卡住</strong>：降低每帧字节数、纠错级别选 H、增大显示大小；对焦抖动是最大敌人，尽量把设备固定住。</li>
+            <li><strong>摄像头无法打开</strong>：检查是否已授予本应用相机权限。</li>
+            <li><strong>提示文件超限</strong>：单文件不能超过 64 MB，可压缩后（zip/rar）再发送。</li>
+          </ul>
+        </div>
+      </details>
+    </main>
+    <footer class="footer">
       <p class="license">
         本项目基于 Decimen Optical Transfer（© 2026 Evan Crawley）二次开发，遵循
         <a href="https://github.com/bashalarmistalt/decimen-optical-transfer/blob/main/LICENSE">AGPL-3.0-or-later 许可协议</a>。
       </p>
-    </main>
-    <footer class="footer">
       <span>
         <a href="https://github.com/bashalarmistalt/decimen-optical-transfer">原项目 GitHub</a>
       </span>
@@ -55,5 +116,20 @@
         <a href="https://github.com/zhubowen-bot/decimen-optical-transfer-ohos">本项目 GitHub</a>
       </span>
     </footer>
+    <script>
+      /* 关于页：显示接收历史的条数与记录开关状态（存储不可用时静默降级） */
+      (function () {
+        try {
+          var raw = localStorage.getItem("lqt.history.meta.v1");
+          var arr = raw ? JSON.parse(raw) : [];
+          var n = Array.isArray(arr) ? arr.length : 0;
+          var on = localStorage.getItem("lqt.history.enabled.v1") !== "0";
+          var el = document.getElementById("history-summary");
+          if (el) {
+            el.textContent = n + " 条记录" + (on ? " · 记录已开启" : " · 记录已关闭");
+          }
+        } catch (e) { /* 忽略 */ }
+      })();
+    </script>
   </body>
 </html>
