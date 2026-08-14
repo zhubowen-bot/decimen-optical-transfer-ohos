@@ -2,6 +2,8 @@
 
 > 用屏幕和摄像头传文件——不需要网络、不需要蓝牙、不需要数据线，数据以**光**为介质。
 > 本项目是开源项目 [Decimen Optical Transfer](https://github.com/bashalarmistalt/decimen-optical-transfer)（© 2026 Evan Crawley，AGPL-3.0-or-later）的 HarmonyOS 移植版，H5 页面源自其 v0.4.0 构建。
+> 
+> * 2026.8.14 核心识别引擎同步至原项目v0.5.2的v3引擎，确保能与decimen主项目兼容互通。除核心引擎外，项目主体结构不再与decimen保持同步，而是基于v0.4.0独立开发。新增历史记录保存功能。
 
 ## ⚠️ 关于当前架构（嵌套 H5）与鸿蒙原生引擎适配情况
 
@@ -224,9 +226,7 @@ decimen-optical-transfer-ohos/
 - `qrcode`（QR 符号生成，MIT）—— © 2011 Ryan Day / © 2009 Kazuhiko Arase，移植：`entry/src/main/ets/qr/QrEncoder.ets`
 - `jsQR`（QR 符号解码，MIT）—— © 2017 David Shim，移植：`entry/src/main/ets/qr/QrDecoder.ets`
 - H5 页面内嵌引擎（MIT 部分）—— © 2026 Steve Dakh；Emscripten（zxing-cpp WASM）
-- UIDesignKit 沉浸光感导航栏框架参考自 BowenAPP-Web（开源项目）
-
-本应用图标与品牌素材：decimen 图标（© 2026，本仓库资源）。
+- 鸿蒙主体应用框架参考自作者的 BowenAPP-Web 框架（开源项目，MIT）
 
 **许可要点**：本软件为自由软件，可自由使用、修改与分发，但**任何衍生作品必须同样以 AGPL-3.0-or-later 开源**；使用本软件提供的服务（包括网络服务）时，需向用户提供对应源码。
 
@@ -236,4 +236,3 @@ decimen-optical-transfer-ohos/
 
 - [Decimen Optical Transfer](https://github.com/bashalarmistalt/decimen-optical-transfer) —— 原项目与传输协议设计
 - [node-qrcode](https://github.com/soldair/node-qrcode) / [jsQR](https://github.com/cozmo/jsQR) —— QR 编解码
-- [BowenAPP-Web](https://github.com/) —— 沉浸光感导航栏框架参考
