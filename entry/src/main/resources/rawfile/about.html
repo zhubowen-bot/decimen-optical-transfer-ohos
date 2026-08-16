@@ -144,26 +144,37 @@ window.__playEntrance = function () {
   }
   var cx = window.innerWidth / 2;
   var cy = window.innerHeight / 2;
+  var data = [];
   for (var j = 0; j < list.length; j++) {
-    (function (el, index) {
-      var rect = el.getBoundingClientRect();
-      var ex = rect.left + rect.width / 2;
-      var ey = rect.top + rect.height / 2;
-      var dx = cx - ex;
-      var dy = cy - ey;
-      if (el.getAnimations) {
-        el.getAnimations().forEach(function (a) { a.cancel(); });
-      }
-      if (el.animate) {
-        el.animate([
-          { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(0.5)', opacity: 0, offset: 0 },
-          { transform: 'translate(0,0) scale(1)', opacity: 1, offset: 1 }
-        ], { duration: 650, delay: index * 25, easing: 'cubic-bezier(.25,.1,.25,1)', fill: 'both' });
-      } else {
-        el.style.opacity = '1';
-      }
-    })(list[j], j);
+    var el = list[j];
+    var rect = el.getBoundingClientRect();
+    var ex = rect.left + rect.width / 2;
+    var ey = rect.top + rect.height / 2;
+    var dx = cx - ex;
+    var dy = cy - ey;
+    if (el.getAnimations) {
+      el.getAnimations().forEach(function (a) { a.cancel(); });
+    }
+    el.style.transition = 'none';
+    el.style.transformOrigin = 'center center';
+    el.style.opacity = '0';
+    el.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(0.5)';
+    data.push({ el: el, dx: dx, dy: dy, index: j });
   }
+  requestAnimationFrame(function () {
+    for (var k = 0; k < data.length; k++) {
+      var d = data[k];
+      if (d.el.animate) {
+        d.el.animate([
+          { transform: 'translate(' + d.dx + 'px,' + d.dy + 'px) scale(0.5)', opacity: 0, offset: 0 },
+          { transform: 'translate(0,0) scale(1)', opacity: 1, offset: 1 }
+        ], { duration: 650, delay: d.index * 25, easing: 'cubic-bezier(.25,.1,.25,1)', fill: 'both' });
+      } else {
+        d.el.style.opacity = '1';
+        d.el.style.transform = 'none';
+      }
+    }
+  });
 };
 </script>
   </body>
