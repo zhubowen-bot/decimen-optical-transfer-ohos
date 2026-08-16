@@ -395,6 +395,14 @@ struct Index {
         })
         .onChange((index: number) => {
           this.currentTabIndex = index;
+          const controller = this.controllers[index];
+          if (controller) {
+            try {
+              controller.runJavaScript("window.__playEntrance && window.__playEntrance()");
+            } catch (e) {
+              // ignore
+            }
+          }
         })
       }
       .width('100%')
