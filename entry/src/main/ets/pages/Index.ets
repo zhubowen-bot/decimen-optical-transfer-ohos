@@ -413,7 +413,7 @@ struct Index {
             this.entranceOverlayTimer = setTimeout(() => {
               this.entranceOverlayVisible = false;
               this.entranceOverlayTimer = -1;
-            }, 80);
+            }, 120);
             if (prev >= 0) {
               try {
                 this.controllers[prev].runJavaScript("window.__prepareEntrance && window.__prepareEntrance()");
@@ -447,7 +447,7 @@ struct Index {
               this.entranceOverlayTimer = setTimeout(() => {
                 this.entranceOverlayVisible = false;
                 this.entranceOverlayTimer = -1;
-              }, 60);
+              }, 120);
             })
         }
     }
