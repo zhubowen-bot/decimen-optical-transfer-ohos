@@ -10,6 +10,7 @@
     <meta name="theme-color" content="#f5f4f3" />
     <style>
       *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body.entrance > header,body.entrance > footer,body.entrance > .topbar,body.entrance main > *,body.entrance .about-shell > *{opacity:0}
       :root{color-scheme:light;--bg:#f5f4f3;--panel:#ffffff;--panel-strong:#f1ede6;--line:#e6dfd5;--line-bright:#ccc2b4;--text:#1c1b18;--text-dim:#3e3b35;--muted:#6f6a60;--muted-dim:#a29b8f;--accent:#1c1b18;--accent-hi:#3e3b35;--accent-ink:#ffffff}
       html{background:var(--bg)}
       body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh}
@@ -47,7 +48,7 @@
       .footer a:hover,.footer a:focus-visible{color:var(--text);text-decoration:underline}
     </style>
   </head>
-  <body>
+  <body class="entrance">
     <main class="about-shell">
       <img class="brand-mark" src="decimen-icon.png" alt="LiveQRTransfer" />
       <h1>LiveQRTransfer</h1>
@@ -133,6 +134,7 @@
     </script>
   <script>
 window.__playEntrance = function () {
+  document.body.classList.remove('entrance');
   var items = document.querySelectorAll('body > header, body > footer, body > .topbar, main > *, .about-shell > *');
   var list = [];
   for (var i = 0; i < items.length; i++) {
