@@ -94,7 +94,6 @@ class TransferHost {
 @Component
 struct Index {
   @State currentTabIndex: number = 0;
-  @State entranceOverlayVisible: boolean = false;
   // 为每个 Tab 创建独立的 WebviewController
   @State controllers: webview.WebviewController[] = [
     new webview.WebviewController(),
@@ -102,7 +101,7 @@ struct Index {
     new webview.WebviewController()
   ];
   private tabsController: HdsTabsController = new HdsTabsController();
-  private entranceOverlayTimer: number = -1;
+  private entrancePlayed: boolean[] = [false, false, false];
   private host: TransferHost = new TransferHost(this);
   private permissionRequested: boolean = false;
   private saveDir: string = '';
@@ -340,9 +339,14 @@ struct Index {
       })
       .onPageEnd(() => {
         hilog.info(DOMAIN, TAG, 'page %{public}d loaded', index);
-        if (this.currentTabIndex === index) {
+        if (this.currentTabIndex === index && !this.entrancePlayed[index]) {
           try {
-            this.controllers[index].runJavaScript("window.__prepareEntrance && window.__prepareEntrance(); window.__playEntrance && window.__playEntrance();");
+            this.controllers[index].runJavaScript("window.__prepareEntrance && window.__prepareEntrance(); window.__playEntrance && window.__playEntrance();")
+              .then(() => {
+                this.entrancePlayed[index] = true;
+              })
+              .catch(() => {
+              });
           } catch (e) {
             // ignore
           }
@@ -403,53 +407,26 @@ struct Index {
           lightColor: ACCENT_COLOR
         })
         .onChange((index: number) => {
-          const prev = this.currentTabIndex;
           this.currentTabIndex = index;
-          if (prev !== index) {
-            this.entranceOverlayVisible = true;
-            if (this.entranceOverlayTimer !== -1) {
-              clearTimeout(this.entranceOverlayTimer);
-            }
-            this.entranceOverlayTimer = setTimeout(() => {
-              this.entranceOverlayVisible = false;
-              this.entranceOverlayTimer = -1;
-            }, 120);
-            if (prev >= 0) {
+          if (!this.entrancePlayed[index]) {
+            const controller = this.controllers[index];
+            if (controller) {
               try {
-                this.controllers[prev].runJavaScript("window.__prepareEntrance && window.__prepareEntrance()");
+                controller.runJavaScript("window.__prepareEntrance && window.__prepareEntrance(); window.__playEntrance && window.__playEntrance();")
+                  .then(() => {
+                    this.entrancePlayed[index] = true;
+                  })
+                  .catch(() => {
+                  });
               } catch (e) {
                 // ignore
               }
-            }
-          }
-          const controller = this.controllers[index];
-          if (controller) {
-            try {
-              controller.runJavaScript("window.__prepareEntrance && window.__prepareEntrance(); window.__playEntrance && window.__playEntrance();");
-            } catch (e) {
-              // ignore
             }
           }
         })
       }
       .width('100%')
       .height('100%')
-        if (this.entranceOverlayVisible) {
-          Column()
-            .width('100%')
-            .height('calc(100% - 96px)')
-            .position({ x: 0, y: 0 })
-            .backgroundColor('#F5F4F3')
-            .onAppear(() => {
-              if (this.entranceOverlayTimer !== -1) {
-                clearTimeout(this.entranceOverlayTimer);
-              }
-              this.entranceOverlayTimer = setTimeout(() => {
-                this.entranceOverlayVisible = false;
-                this.entranceOverlayTimer = -1;
-              }, 120);
-            })
-        }
     }
     .mode(NavigationMode.Stack)
     .hideBackButton(true)
