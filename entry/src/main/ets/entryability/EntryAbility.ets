@@ -24,8 +24,8 @@ export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     try {
       initGzipTempDir(this.context.filesDir);
-      // 应用强制深色模式（H5 页面均为深色暖调主题）
-      this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK);
+      // 应用强制浅色模式（H5 页面均为浅色暖调主题）
+      this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
     }
@@ -50,15 +50,15 @@ export default class EntryAbility extends UIAbility {
     });
   }
 
-  // 系统状态栏/导航栏跟随 H5 主题（rawfile 页面 :root --bg: #1c1917）
+  // 系统状态栏/导航栏跟随 H5 主题（rawfile 页面 :root --bg: #f7f4ef）
   private applySystemBarTheme(): void {
     try {
       window.getLastWindow(this.context).then((mainWindow: window.Window) => {
         mainWindow.setWindowSystemBarProperties({
-          statusBarColor: '#1C1917',
-          statusBarContentColor: '#FFFFFFFF',
-          navigationBarColor: '#1C1917',
-          navigationBarContentColor: '#FFFFFFFF'
+          statusBarColor: '#F7F4EF',
+          statusBarContentColor: '#FF000000',
+          navigationBarColor: '#F7F4EF',
+          navigationBarContentColor: '#FF000000'
         });
       }).catch((e: Error) => {
         hilog.error(DOMAIN, 'testTag', 'Failed to get the main window. Cause: %{public}s', JSON.stringify(e));

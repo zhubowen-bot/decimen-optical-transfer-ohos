@@ -7,10 +7,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>接收历史 — LiveQRTransfer</title>
-    <meta name="theme-color" content="#1c1917" />
+    <meta name="theme-color" content="#f7f4ef" />
     <style>
       *{box-sizing:border-box}
-      :root{color-scheme:dark;--bg:#1c1917;--panel:#262220;--panel-strong:#34302c;--line:#3a3531;--line-bright:#544d46;--text:#faf6f0;--text-dim:#e5ded4;--muted:#b3aa9e;--muted-dim:#857d73;--accent:#d96c4a;--accent-hi:#e07a56;--accent-ink:#1c1917;--red:#e0715a;--red-rgb:224,113,90;--accent-rgb:217,108,74;--bg-rgb:28,25,23}
+      :root{color-scheme:light;--bg:#f7f4ef;--panel:#ffffff;--panel-strong:#f1ede6;--line:#e6dfd5;--line-bright:#ccc2b4;--text:#1c1b18;--text-dim:#3e3b35;--muted:#6f6a60;--muted-dim:#a29b8f;--accent:#b8542f;--accent-hi:#9e4526;--accent-ink:#ffffff;--red:#b3402e;--red-rgb:179,64,46;--accent-rgb:184,84,47;--bg-rgb:247,244,239}
       html{background:var(--bg)}
       body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh}
       button{font:inherit}
@@ -18,7 +18,7 @@
       [hidden]{display:none!important}
       .topbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:max(8px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 8px max(16px,env(safe-area-inset-left));border-bottom:1px solid var(--line);background:rgba(var(--bg-rgb),.88);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%)}
       .topbar h1{flex:1;margin:0;text-align:center;font-size:16px;font-weight:700;color:var(--text)}
-      .nav-btn{width:64px;padding:8px 0;border:0;border-radius:12px;background:transparent;color:var(--accent);font-size:14px;font-weight:600;cursor:pointer;text-align:left}
+      .nav-btn{width:64px;padding:8px 0;border:0;border-radius:12px;background:transparent;color:var(--text-dim);font-size:14px;font-weight:600;cursor:pointer;text-align:left}
       .nav-btn:hover{background:var(--panel-strong)}
       .nav-btn.danger{color:var(--red);text-align:right}
       .nav-btn.danger:disabled{color:var(--muted-dim);cursor:default}
@@ -31,7 +31,7 @@
       .switch{position:relative;flex:none;width:48px;height:28px}
       .switch input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
       .switch .track{position:absolute;inset:0;border-radius:999px;background:var(--line-bright);transition:background-color .15s ease}
-      .switch .track::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#faf6f0;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s ease}
+      .switch .track::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s ease}
       .switch input:checked+.track{background:var(--accent)}
       .switch input:checked+.track::after{transform:translateX(20px)}
       .switch input:focus-visible+.track{outline:2px solid var(--accent);outline-offset:2px}
@@ -44,8 +44,8 @@
       .item-name{margin:0;font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
       .item-meta{margin:2px 0 0;font-size:11px;color:var(--muted)}
       .item-actions{flex:none;display:flex;align-items:center;gap:14px}
-      .text-button{padding:0;border:0;border-radius:0;background:transparent;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer}
-      .text-button:hover{text-decoration:underline}
+      .text-button{padding:0;border:0;border-radius:0;background:transparent;color:var(--text-dim);font-size:13px;font-weight:600;cursor:pointer}
+      .text-button:hover{color:var(--accent);text-decoration:underline}
       .text-button:disabled{color:var(--muted-dim);cursor:not-allowed;text-decoration:none}
       .text-button.danger{color:var(--red)}
       .empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:52px 16px;text-align:center}
@@ -60,7 +60,7 @@
       .secondary-button{padding:10px 18px;color:var(--text-dim);background:var(--panel);border:1px solid var(--line-bright);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer}
       .secondary-button:hover{border-color:var(--text-dim);color:var(--text)}
       .danger-button{padding:10px 18px;color:var(--accent-ink);background:var(--red);border:0;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.12)}
-      .danger-button:hover{background:#e8816c}
+      .danger-button:hover{background:#a33a2a}
       .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:20;max-width:min(90vw,420px);padding:9px 18px;color:#faf6f0;background:rgba(12,10,9,.92);border:1px solid rgba(250,246,240,.2);border-radius:999px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
       @media(max-width:420px){.shell{width:calc(100% - 24px)}.item{gap:10px;padding:11px 12px}.item-actions{gap:12px}}
     </style>
