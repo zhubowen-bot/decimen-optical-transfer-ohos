@@ -340,7 +340,7 @@ struct Index {
         hilog.info(DOMAIN, TAG, 'page %{public}d loaded', index);
         if (this.currentTabIndex === index) {
           try {
-            this.controllers[index].runJavaScript("window.__playEntrance && window.__playEntrance()");
+            this.controllers[index].runJavaScript("window.__prepareEntrance && window.__prepareEntrance(); window.__playEntrance && window.__playEntrance();");
           } catch (e) {
             // ignore
           }
@@ -413,7 +413,7 @@ struct Index {
           const controller = this.controllers[index];
           if (controller) {
             try {
-              controller.runJavaScript("window.__playEntrance && window.__playEntrance()");
+              controller.runJavaScript("window.__prepareEntrance && window.__prepareEntrance(); window.__playEntrance && window.__playEntrance();");
             } catch (e) {
               // ignore
             }
