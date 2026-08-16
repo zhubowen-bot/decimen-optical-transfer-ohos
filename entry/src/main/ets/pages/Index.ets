@@ -338,6 +338,13 @@ struct Index {
       })
       .onPageEnd(() => {
         hilog.info(DOMAIN, TAG, 'page %{public}d loaded', index);
+        if (this.currentTabIndex === index) {
+          try {
+            this.controllers[index].runJavaScript("window.__playEntrance && window.__playEntrance()");
+          } catch (e) {
+            // ignore
+          }
+        }
       })
       .onErrorReceive((event) => {
         if (event) {
