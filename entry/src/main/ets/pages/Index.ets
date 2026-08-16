@@ -14,7 +14,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 const DOMAIN: number = 0xdc1;
 const TAG: string = 'LiveQRTransfer';
 // H5 主题色（与 rawfile 页面 :root 的 --accent 保持一致）
-const ACCENT_COLOR: string = '#7BC043';
+const ACCENT_COLOR: string = '#F43F5E';
 
 interface MenuItem {
   symbolGlyph: SymbolGlyphModifier;
