@@ -10,7 +10,7 @@
     <meta name="theme-color" content="#f7f4ef" />
     <style>
       *{box-sizing:border-box}
-      :root{color-scheme:light;--bg:#f7f4ef;--panel:#ffffff;--panel-strong:#f1ede6;--line:#e6dfd5;--line-bright:#ccc2b4;--text:#1c1b18;--text-dim:#3e3b35;--muted:#6f6a60;--muted-dim:#a29b8f;--accent:#e4574f;--accent-hi:#f06a5e;--accent-ink:#ffffff;--red:#b3402e;--red-rgb:179,64,46;--accent-rgb:228,87,79;--bg-rgb:247,244,239}
+      :root{color-scheme:light;--bg:#f7f4ef;--panel:#ffffff;--panel-strong:#f1ede6;--line:#e6dfd5;--line-bright:#ccc2b4;--text:#1c1b18;--text-dim:#3e3b35;--muted:#6f6a60;--muted-dim:#a29b8f;--accent:#7bc043;--accent-hi:#8fd457;--accent-ink:#1c1b18;--red:#b3402e;--red-rgb:179,64,46;--accent-rgb:123,192,67;--bg-rgb:247,244,239}
       html{background:var(--bg)}
       body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh}
       button{font:inherit}
@@ -59,7 +59,7 @@
       .dialog-actions{display:flex;justify-content:flex-end;gap:10px}
       .secondary-button{padding:10px 18px;color:var(--text-dim);background:var(--panel);border:1px solid var(--line-bright);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer}
       .secondary-button:hover{border-color:var(--text-dim);color:var(--text)}
-      .danger-button{padding:10px 18px;color:var(--accent-ink);background:var(--red);border:0;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.12)}
+      .danger-button{padding:10px 18px;color:#fff;background:var(--red);border:0;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.12)}
       .danger-button:hover{background:#a33a2a}
       .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:20;max-width:min(90vw,420px);padding:9px 18px;color:#faf6f0;background:rgba(12,10,9,.92);border:1px solid rgba(250,246,240,.2);border-radius:999px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
       @media(max-width:420px){.shell{width:calc(100% - 24px)}.item{gap:10px;padding:11px 12px}.item-actions{gap:12px}}
