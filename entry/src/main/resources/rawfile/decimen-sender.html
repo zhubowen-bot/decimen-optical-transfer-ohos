@@ -77,7 +77,7 @@ details.settings select,details.settings input[type=range]{font:inherit;font-siz
 .metric .v{font-size:16px;font-variant-numeric:tabular-nums}
 .metric .v.amber{color:var(--text)}
 .metric .v.ok{color:var(--green)}
-:root{color-scheme:light;--bg:#f7f4ef;--panel:#ffffff;--panel-strong:#f1ede6;--line:#e6dfd5;--line-bright:#ccc2b4;--text:#1c1b18;--text-dim:#3e3b35;--muted:#6f6a60;--muted-dim:#a29b8f;--accent:#b8542f;--accent-hi:#9e4526;--accent-ink:#ffffff;--green:#3f6b4f;--red:#b3402e;--red-rgb:179,64,46;--viewport-bg:#171512;--accent-rgb:184,84,47;--bg-rgb:247,244,239}
+:root{color-scheme:light;--bg:#f7f4ef;--panel:#ffffff;--panel-strong:#f1ede6;--line:#e6dfd5;--line-bright:#ccc2b4;--text:#1c1b18;--text-dim:#3e3b35;--muted:#6f6a60;--muted-dim:#a29b8f;--accent:#5b6b3a;--accent-hi:#49592e;--accent-ink:#ffffff;--green:#3f6b4f;--red:#b3402e;--red-rgb:179,64,46;--viewport-bg:#171512;--accent-rgb:91,107,58;--bg-rgb:247,244,239}
 .home-page,.tool-page,.receiver-page{display:flex;flex-direction:column;align-items:stretch;gap:0;padding:0;min-height:100svh;background:var(--bg)}
 .home-shell,.send-shell,.receiver-shell{flex:1 0 auto}
 .site-header{width:100%;min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:max(6px,env(safe-area-inset-top)) max(22px,env(safe-area-inset-right)) 6px max(16px,env(safe-area-inset-left));border-bottom:1px solid var(--line);background:rgba(var(--bg-rgb),.88);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);position:relative;z-index:3}
@@ -125,12 +125,14 @@ details.settings select,details.settings input[type=range]{font:inherit;font-siz
 .demo-buttons{display:flex;flex-wrap:wrap;gap:8px}
 .demo-buttons button{width:auto;padding:9px 16px;color:var(--text-dim);background:var(--panel);border:1px solid var(--line-bright);border-radius:12px;font-size:13px;font-weight:500}
 .demo-buttons button:hover{border-color:var(--text-dim);color:var(--text)}
-.mode-picker{display:flex;gap:4px;padding:4px;background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:0 1px 2px rgba(0,0,0,.03),0 4px 12px rgba(0,0,0,.04)}
-.mode-picker label{flex:1}
+.mode-picker{position:relative;display:flex;gap:4px;padding:4px;background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:0 1px 2px rgba(0,0,0,.03),0 4px 12px rgba(0,0,0,.04)}
+.mode-picker label{flex:1;position:relative;z-index:1}
 .mode-picker input{position:absolute;opacity:0;pointer-events:none}
-.mode-picker span{display:block;padding:9px 14px;border-radius:12px;color:var(--muted);font-size:13px;font-weight:600;text-align:center;cursor:pointer;transition:background .12s ease,color .12s ease}
+.mode-indicator{position:absolute;top:4px;left:4px;width:calc(50% - 5px);height:calc(100% - 10px);background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(28,27,24,.1),0 4px 12px rgba(28,27,24,.06);transition:transform .28s cubic-bezier(.2,.8,.2,1);z-index:0;pointer-events:none}
+.mode-picker.snippet .mode-indicator{transform:translateX(100%)}
+.mode-picker span{display:block;padding:9px 14px;border-radius:12px;color:var(--muted);font-size:13px;font-weight:600;text-align:center;cursor:pointer;transition:color .2s ease}
 .mode-picker span:hover{color:var(--text)}
-.mode-picker input:checked+span{color:var(--text);background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.mode-picker input:checked+span{color:var(--text)}
 .mode-picker input:focus-visible+span{outline:2px solid var(--accent);outline-offset:1px}
 .send-shell .stage{max-width:100%;overflow:hidden;scroll-margin-top:16px}
 .note-composer{display:flex;flex-direction:column;gap:8px;color:var(--text-dim);font-size:12px;font-weight:600}
@@ -200,6 +202,7 @@ details.settings select,details.settings input[type=range]{font:inherit;font-siz
       </section>
 
       <div class="mode-picker" id="mode-picker" role="radiogroup" aria-label="要发送的内容">
+        <span class="mode-indicator" aria-hidden="true"></span>
         <label>
           <input type="radio" name="send-mode" value="file" checked />
           <span>文件</span>
@@ -296,5 +299,20 @@ details.settings select,details.settings input[type=range]{font:inherit;font-siz
         在另一台设备上打开独立的接收端。把本机屏幕亮度调高。
       </div>
     </main>
+    <script>
+      (function () {
+        var picker = document.getElementById('mode-picker');
+        if (!picker) return;
+        var inputs = picker.querySelectorAll('input[name="send-mode"]');
+        function sync() {
+          var checked = picker.querySelector('input:checked');
+          picker.classList.toggle('snippet', !!checked && checked.value === 'snippet');
+        }
+        for (var i = 0; i < inputs.length; i++) {
+          inputs[i].addEventListener('change', sync);
+        }
+        sync();
+      })();
+    </script>
   </body>
 </html>
