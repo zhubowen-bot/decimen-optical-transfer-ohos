@@ -440,6 +440,15 @@ struct Index {
             .height('calc(100% - 96px)')
             .position({ x: 0, y: 0 })
             .backgroundColor('#F5F4F3')
+            .onAppear(() => {
+              if (this.entranceOverlayTimer !== -1) {
+                clearTimeout(this.entranceOverlayTimer);
+              }
+              this.entranceOverlayTimer = setTimeout(() => {
+                this.entranceOverlayVisible = false;
+                this.entranceOverlayTimer = -1;
+              }, 60);
+            })
         }
     }
     .mode(NavigationMode.Stack)
