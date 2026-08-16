@@ -50,14 +50,14 @@ export default class EntryAbility extends UIAbility {
     });
   }
 
-  // 系统状态栏/导航栏跟随 H5 主题（rawfile 页面 :root --bg: #ffffff）
+  // 系统状态栏/导航栏跟随 H5 主题（rawfile 页面 :root --bg: #f6f4f0）
   private applySystemBarTheme(): void {
     try {
       window.getLastWindow(this.context).then((mainWindow: window.Window) => {
         mainWindow.setWindowSystemBarProperties({
-          statusBarColor: '#FFFFFF',
+          statusBarColor: '#F6F4F0',
           statusBarContentColor: '#FF000000',
-          navigationBarColor: '#FFFFFF',
+          navigationBarColor: '#F6F4F0',
           navigationBarContentColor: '#FF000000'
         });
       }).catch((e: Error) => {
