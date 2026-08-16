@@ -7,10 +7,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>接收历史 — LiveQRTransfer</title>
-    <meta name="theme-color" content="#f6f4f0" />
+    <meta name="theme-color" content="#1c1917" />
     <style>
       *{box-sizing:border-box}
-      :root{color-scheme:light;--bg:#f6f4f0;--panel:#ffffff;--panel-strong:#edeae4;--line:#e4dfd6;--line-bright:#c9c2b6;--text:#1c1b18;--text-dim:#3e3b35;--muted:#6f6a60;--muted-dim:#a29b8f;--accent:#0e6b5c;--accent-hi:#0a5247;--accent-ink:#ffffff;--red:#b3402e;--red-rgb:179,64,46;--accent-rgb:14,107,92;--bg-rgb:246,244,240}
+      :root{color-scheme:dark;--bg:#1c1917;--panel:#262220;--panel-strong:#34302c;--line:#3a3531;--line-bright:#544d46;--text:#faf6f0;--text-dim:#e5ded4;--muted:#b3aa9e;--muted-dim:#857d73;--accent:#d96c4a;--accent-hi:#e07a56;--accent-ink:#1c1917;--red:#e0715a;--red-rgb:224,113,90;--accent-rgb:217,108,74;--bg-rgb:28,25,23}
       html{background:var(--bg)}
       body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh}
       button{font:inherit}
@@ -31,7 +31,7 @@
       .switch{position:relative;flex:none;width:48px;height:28px}
       .switch input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
       .switch .track{position:absolute;inset:0;border-radius:999px;background:var(--line-bright);transition:background-color .15s ease}
-      .switch .track::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s ease}
+      .switch .track::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#faf6f0;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s ease}
       .switch input:checked+.track{background:var(--accent)}
       .switch input:checked+.track::after{transform:translateX(20px)}
       .switch input:focus-visible+.track{outline:2px solid var(--accent);outline-offset:2px}
@@ -60,8 +60,8 @@
       .secondary-button{padding:10px 18px;color:var(--text-dim);background:var(--panel);border:1px solid var(--line-bright);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer}
       .secondary-button:hover{border-color:var(--text-dim);color:var(--text)}
       .danger-button{padding:10px 18px;color:var(--accent-ink);background:var(--red);border:0;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.12)}
-      .danger-button:hover{background:#8f1d17}
-      .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:20;max-width:min(90vw,420px);padding:9px 18px;color:#f5f4f0;background:rgba(23,23,23,.9);border:1px solid rgba(255,255,255,.18);border-radius:999px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .danger-button:hover{background:#e8816c}
+      .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:20;max-width:min(90vw,420px);padding:9px 18px;color:#faf6f0;background:rgba(12,10,9,.92);border:1px solid rgba(250,246,240,.2);border-radius:999px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
       @media(max-width:420px){.shell{width:calc(100% - 24px)}.item{gap:10px;padding:11px 12px}.item-actions{gap:12px}}
     </style>
   </head>
