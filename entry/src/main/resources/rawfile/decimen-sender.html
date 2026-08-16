@@ -128,7 +128,7 @@ details.settings select,details.settings input[type=range]{font:inherit;font-siz
 .mode-picker{position:relative;display:flex;gap:4px;padding:4px;background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:0 1px 2px rgba(0,0,0,.03),0 4px 12px rgba(0,0,0,.04);-webkit-tap-highlight-color:transparent}
 .mode-picker label{flex:1;position:relative;z-index:1;-webkit-tap-highlight-color:transparent;cursor:pointer}
 .mode-picker input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
-.mode-indicator{position:absolute;top:4px;left:4px;width:calc(50% - 5px);height:calc(100% - 10px);background:#f2f2f2;border-radius:12px;box-shadow:0 1px 4px rgba(28,27,24,.1),0 4px 12px rgba(28,27,24,.06);transition:left .3s ease;will-change:left;z-index:0;pointer-events:none}
+.mode-indicator{position:absolute;top:4px;left:4px;width:calc(50% - 5px);height:calc(100% - 10px);background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(28,27,24,.1),0 4px 12px rgba(28,27,24,.06);transition:left .3s ease;will-change:left;z-index:0;pointer-events:none}
 .mode-picker input[value="snippet"]:checked ~ .mode-indicator,
 .mode-picker.snippet .mode-indicator,
 .mode-picker:has(input[value="snippet"]:checked) .mode-indicator{left:calc(50% - 1px)}
@@ -210,7 +210,7 @@ details.settings select,details.settings input[type=range]{font:inherit;font-siz
         <input type="radio" name="send-mode" value="snippet" id="mode-snippet" />
         <label for="mode-file"><span>文件</span></label>
         <label for="mode-snippet"><span>文本片段</span></label>
-        <span class="mode-indicator" aria-hidden="true"></span>
+        <span class="mode-indicator" id="mode-indicator" aria-hidden="true"></span>
       </div>
 
       <!-- The whole label is the click target; the native input is visually
@@ -303,11 +303,32 @@ details.settings select,details.settings input[type=range]{font:inherit;font-siz
       (function () {
         var picker = document.getElementById('mode-picker');
         if (!picker) return;
+        var indicator = document.getElementById('mode-indicator');
         var inputs = picker.querySelectorAll('input[name="send-mode"]');
         var labels = picker.querySelectorAll('label');
+        var first = true;
+        function targetLeft() {
+          var checked = picker.querySelector('input:checked');
+          return (!!checked && checked.value === 'snippet') ? 'calc(50% - 1px)' : '4px';
+        }
         function sync() {
           var checked = picker.querySelector('input:checked');
-          picker.classList.toggle('snippet', !!checked && checked.value === 'snippet');
+          var snippet = !!checked && checked.value === 'snippet';
+          picker.classList.toggle('snippet', snippet);
+          if (!indicator) return;
+          var to = targetLeft();
+          if (first) {
+            indicator.style.left = to;
+            first = false;
+            return;
+          }
+          if (indicator.animate) {
+            var from = getComputedStyle(indicator).left;
+            indicator.animate([{ left: from }, { left: to }], { duration: 280, easing: 'ease' });
+            indicator.style.left = to;
+          } else {
+            indicator.style.left = to;
+          }
         }
         for (var i = 0; i < inputs.length; i++) {
           inputs[i].addEventListener('change', sync);
