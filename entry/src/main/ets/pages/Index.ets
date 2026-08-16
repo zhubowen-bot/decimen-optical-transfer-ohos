@@ -350,6 +350,12 @@ struct Index {
           } catch (e) {
             // ignore
           }
+        } else if (this.currentTabIndex === index) {
+          try {
+            this.controllers[index].runJavaScript("window.__revealEntrance && window.__revealEntrance()");
+          } catch (e) {
+            // ignore
+          }
         }
       })
       .onErrorReceive((event) => {

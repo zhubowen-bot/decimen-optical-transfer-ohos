@@ -155,6 +155,25 @@ window.__prepareEntrance = function () {
   }
   document.body.classList.add('entrance');
 };
+window.__revealEntrance = function () {
+  document.body.classList.remove('entrance');
+  var items = document.querySelectorAll('body > header, body > footer, body > .topbar, main > *, .about-shell > *');
+  for (var i = 0; i < items.length; i++) {
+    var el = items[i];
+    if (el.getAnimations) {
+      el.getAnimations().forEach(function (a) { a.cancel(); });
+    }
+    el.style.transition = '';
+    el.style.transformOrigin = '';
+    el.style.opacity = '';
+    el.style.transform = '';
+  }
+};
+window.addEventListener('pageshow', function (e) {
+  if (e.persisted && window.__revealEntrance) {
+    window.__revealEntrance();
+  }
+});
 window.__playEntrance = function () {
   var items = document.querySelectorAll('body > header, body > footer, body > .topbar, main > *, .about-shell > *');
   var cx = window.innerWidth / 2;
@@ -171,6 +190,7 @@ window.__playEntrance = function () {
     el.style.opacity = '0';
     data.push({ el: el, index: i });
   }
+  document.body.classList.remove('entrance');
   requestAnimationFrame(function () {
     requestAnimationFrame(function () {
       for (var k = 0; k < data.length; k++) {
