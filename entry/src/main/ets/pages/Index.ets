@@ -94,6 +94,7 @@ class TransferHost {
 @Component
 struct Index {
   @State currentTabIndex: number = 0;
+  @State entranceOverlayVisible: boolean = false;
   // 为每个 Tab 创建独立的 WebviewController
   @State controllers: webview.WebviewController[] = [
     new webview.WebviewController(),
@@ -101,6 +102,7 @@ struct Index {
     new webview.WebviewController()
   ];
   private tabsController: HdsTabsController = new HdsTabsController();
+  private entranceOverlayTimer: number = -1;
   private host: TransferHost = new TransferHost(this);
   private permissionRequested: boolean = false;
   private saveDir: string = '';
@@ -403,11 +405,21 @@ struct Index {
         .onChange((index: number) => {
           const prev = this.currentTabIndex;
           this.currentTabIndex = index;
-          if (prev !== index && prev >= 0) {
-            try {
-              this.controllers[prev].runJavaScript("window.__prepareEntrance && window.__prepareEntrance()");
-            } catch (e) {
-              // ignore
+          if (prev !== index) {
+            this.entranceOverlayVisible = true;
+            if (this.entranceOverlayTimer !== -1) {
+              clearTimeout(this.entranceOverlayTimer);
+            }
+            this.entranceOverlayTimer = setTimeout(() => {
+              this.entranceOverlayVisible = false;
+              this.entranceOverlayTimer = -1;
+            }, 80);
+            if (prev >= 0) {
+              try {
+                this.controllers[prev].runJavaScript("window.__prepareEntrance && window.__prepareEntrance()");
+              } catch (e) {
+                // ignore
+              }
             }
           }
           const controller = this.controllers[index];
@@ -422,6 +434,13 @@ struct Index {
       }
       .width('100%')
       .height('100%')
+        if (this.entranceOverlayVisible) {
+          Column()
+            .width('100%')
+            .height('calc(100% - 96px)')
+            .position({ x: 0, y: 0 })
+            .backgroundColor('#F5F4F3')
+        }
     }
     .mode(NavigationMode.Stack)
     .hideBackButton(true)
