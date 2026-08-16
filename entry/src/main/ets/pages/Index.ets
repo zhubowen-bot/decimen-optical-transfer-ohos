@@ -382,7 +382,7 @@ struct Index {
         .barOverlap(true)
         .vertical(false)
         .barPosition(BarPosition.End)
-        .animationDuration(300)
+        .animationDuration(0)
         .barHeight(56)
         .barFloatingStyle({
           barBottomMargin: 28,
