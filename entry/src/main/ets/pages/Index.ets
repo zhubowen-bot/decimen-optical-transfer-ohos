@@ -401,7 +401,15 @@ struct Index {
           lightColor: ACCENT_COLOR
         })
         .onChange((index: number) => {
+          const prev = this.currentTabIndex;
           this.currentTabIndex = index;
+          if (prev !== index && prev >= 0) {
+            try {
+              this.controllers[prev].runJavaScript("window.__prepareEntrance && window.__prepareEntrance()");
+            } catch (e) {
+              // ignore
+            }
+          }
           const controller = this.controllers[index];
           if (controller) {
             try {
