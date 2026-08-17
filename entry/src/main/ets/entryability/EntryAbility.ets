@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 
-import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
+import { abilityAccessCtrl, AbilityConstant, ConfigurationConstant, Permissions, UIAbility, Want } from '@kit.AbilityKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { initGzipTempDir } from '../common/GzipWrap';
@@ -21,6 +22,8 @@ import { initGzipTempDir } from '../common/GzipWrap';
 const DOMAIN = 0x0000;
 
 export default class EntryAbility extends UIAbility {
+  private cameraPermissionRequested: boolean = false;
+
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     try {
       initGzipTempDir(this.context.filesDir);
@@ -47,6 +50,7 @@ export default class EntryAbility extends UIAbility {
       }
       hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
       this.applySystemBarTheme();
+      this.requestCameraPermissionOnce();
     });
   }
 
@@ -68,6 +72,29 @@ export default class EntryAbility extends UIAbility {
     }
   }
 
+  // 首次进入应用即申请相机权限；loadContent 回调与 onForeground 都可能先触发，
+  // 用标志位保证只发起一次，若系统调用失败则允许另一个时机重试。
+  private requestCameraPermissionOnce(): void {
+    if (this.cameraPermissionRequested) {
+      return;
+    }
+    this.cameraPermissionRequested = true;
+    try {
+      const permissions: Array<Permissions> = ['ohos.permission.CAMERA'];
+      abilityAccessCtrl.createAtManager().requestPermissionsFromUser(this.context, permissions)
+        .then((data) => {
+          hilog.info(DOMAIN, 'testTag', 'camera permission result: %{public}s', JSON.stringify(data));
+        })
+        .catch((err: BusinessError) => {
+          this.cameraPermissionRequested = false;
+          hilog.error(DOMAIN, 'testTag', 'camera permission request failed: %{public}s', err.message);
+        });
+    } catch (e) {
+      this.cameraPermissionRequested = false;
+      hilog.error(DOMAIN, 'testTag', 'camera permission request exception: %{public}s', JSON.stringify(e));
+    }
+  }
+
   onWindowStageDestroy(): void {
     // Main window is destroyed, release UI related resources
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageDestroy');
@@ -76,6 +103,8 @@ export default class EntryAbility extends UIAbility {
   onForeground(): void {
     // Ability has brought to foreground
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onForeground');
+    // 首次进入前台即申请相机权限；不要在 WebView onControllerAttached 等过早时机申请
+    this.requestCameraPermissionOnce();
   }
 
   onBackground(): void {

@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\a1519\\.ohos\\config\\default_decimen-optical-transfer-ohos_bm9yZc-R_tZaFgwB4W84EwevXUg835oQlWR6qF_vBGY=.cer",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001B95B64AEF7542D86291A6E954A604D5E0B8119F504DEB85B952D3343AD754626C53B738AAC09707",
-          "profile": "C:\\Users\\a1519\\.ohos\\config\\default_decimen-optical-transfer-ohos_bm9yZc-R_tZaFgwB4W84EwevXUg835oQlWR6qF_vBGY=.p7b",
+          "storeFile": "C:/Users/a1519/Desktop/AI文本转换/aitransformer.p12",
+          "storePassword": "00000019F4E1594B250CEB2EF045D9DD0241EC3B19BD3EFD0BD8264A6A5618BEBDBE070D3110BFBDE3",
+          "keyAlias": "aitransformer",
+          "keyPassword": "00000019FC295358D649F5B92ABA585FE3008E510FDC8D88988FCB6A93F12DEC859B1D3D13D32C0B5A",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\a1519\\.ohos\\config\\default_decimen-optical-transfer-ohos_bm9yZc-R_tZaFgwB4W84EwevXUg835oQlWR6qF_vBGY=.p12",
-          "storePassword": "0000001BD803C65770299F914CDA41C0858D1CA30E309B85213547112E28E41C5D2AF9B84FC959C1BD51F6"
+          "profile": "C:/Users/a1519/Desktop/AI文本转换/liveqrtransferRelease.p7b",
+          "certpath": "C:/Users/a1519/Desktop/AI文本转换/aitransformer.cer"
         }
       }
     ],

@@ -103,7 +103,7 @@ struct Index {
   private tabsController: HdsTabsController = new HdsTabsController();
   private entrancePlayed: boolean[] = [false, false, false];
   private host: TransferHost = new TransferHost(this);
-  private permissionRequested: boolean = false;
+  private cameraPermissionRequesting: boolean = false;
   private saveDir: string = '';
   private saveFile: fs.File | undefined = undefined;
   private saveName: string = '';
@@ -260,6 +260,64 @@ struct Index {
     }
   }
 
+  // ---------- Web 权限：相机系统权限兜底 ----------
+
+  private handleWebPermissionRequest(request: PermissionRequest): void {
+    const resources: Array<string> = request.getAccessibleResource();
+    const needsCamera: boolean = resources.includes('TYPE_VIDEO_CAPTURE');
+    if (!needsCamera) {
+      request.grant(resources);
+      return;
+    }
+    if (this.isCameraPermissionGranted()) {
+      request.grant(resources);
+      return;
+    }
+    if (this.cameraPermissionRequesting) {
+      request.deny();
+      return;
+    }
+    this.cameraPermissionRequesting = true;
+    this.requestCameraSystemPermission().then((granted: boolean) => {
+      this.cameraPermissionRequesting = false;
+      try {
+        if (granted) {
+          request.grant(resources);
+        } else {
+          request.deny();
+        }
+      } catch (e) {
+        hilog.warn(DOMAIN, TAG, 'handle web camera permission failed: %{public}s', String(e));
+      }
+    });
+  }
+
+  private isCameraPermissionGranted(): boolean {
+    try {
+      const context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
+      const grantStatus: abilityAccessCtrl.GrantStatus = abilityAccessCtrl.createAtManager().checkAccessTokenSync(
+        context.applicationInfo.accessTokenId, 'ohos.permission.CAMERA');
+      return grantStatus === abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED;
+    } catch (err) {
+      hilog.warn(DOMAIN, TAG, 'check camera permission failed: %{public}s', String(err));
+      return false;
+    }
+  }
+
+  private requestCameraSystemPermission(): Promise<boolean> {
+    const context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    const perms: Array<Permissions> = ['ohos.permission.CAMERA'];
+    return abilityAccessCtrl.createAtManager().requestPermissionsFromUser(context, perms)
+      .then((data) => {
+        hilog.info(DOMAIN, TAG, 'camera permission result: %{public}s', JSON.stringify(data));
+        return data.authResults.length > 0 && data.authResults[0] === 0;
+      })
+      .catch((err: BusinessError) => {
+        hilog.warn(DOMAIN, TAG, 'camera permission request failed: %{public}s', err.message);
+        return false;
+      });
+  }
+
   // ---------- 返回键：优先回退当前 Tab 的 Web 历史 ----------
 
   onBackPress(): boolean {
@@ -314,27 +372,7 @@ struct Index {
       })
       .onPermissionRequest((event) => {
         if (event) {
-          event.request.grant(event.request.getAccessibleResource());
-        }
-      })
-      .onControllerAttached(() => {
-        // 相机权限只需申请一次（接收端使用）
-        if (this.permissionRequested) {
-          return;
-        }
-        this.permissionRequested = true;
-        const perms: Array<Permissions> = ['ohos.permission.CAMERA'];
-        try {
-          abilityAccessCtrl.createAtManager().requestPermissionsFromUser(
-            this.getUIContext().getHostContext() as common.UIAbilityContext, perms)
-            .then((data) => {
-              hilog.info(DOMAIN, TAG, 'permission result: %{public}s', JSON.stringify(data));
-            })
-            .catch((err: BusinessError) => {
-              hilog.warn(DOMAIN, TAG, 'permission request failed: %{public}s', err.message);
-            });
-        } catch (error) {
-          hilog.warn(DOMAIN, TAG, 'permission request exception: %{public}s', JSON.stringify(error));
+          this.handleWebPermissionRequest(event.request);
         }
       })
       .onPageEnd(() => {
